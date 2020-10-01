@@ -64,6 +64,14 @@ impl EventHandler for Handler {
                     println!("Joined {}", &chan_id);
                   }
 
+                  if manager.join(&guild, chan_id).is_some() {
+                    println!("Joined {}", &chan_id);
+                  }
+
+                  if manager.join(&guild, chan_id).is_some() {
+                    println!("Joined {}", &chan_id);
+                  }
+
                   match manager.get_mut(&guild) {
                     Some(handler) => {
                       println!("Starting YouTube download...");
