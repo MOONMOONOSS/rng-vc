@@ -61,6 +61,7 @@ impl EventHandler for Handler {
                   let mut manager = manager_lock.lock().await;
 
                   if let Some(handler) = manager.join(&guild, chan_id) {
+                    handler.join(*chan_id);
                     println!("Starting YouTube download...");
                     // let source = match voice::ytdl("https://youtube.com/watch?v=S7rM1zmCj1M").await {
                     let source = match voice::ytdl("https://www.youtube.com/watch?v=oNXzMBA9VU4").await {
