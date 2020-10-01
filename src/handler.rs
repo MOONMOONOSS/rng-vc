@@ -60,50 +60,35 @@ impl EventHandler for Handler {
                   // Join channel logic
                   let mut manager = manager_lock.lock().await;
 
-                  if manager.join(&guild, chan_id).is_some() {
-                    println!("Joined {}", &chan_id);
-                  }
+                  if let Some(handler) = manager.join(&guild, chan_id) {
+                    println!("Starting YouTube download...");
+                    // let source = match voice::ytdl("https://youtube.com/watch?v=S7rM1zmCj1M").await {
+                    let source = match voice::ytdl("https://www.youtube.com/watch?v=oNXzMBA9VU4").await {
+                      Ok(source) => source,
+                      Err(why) => {
+                        println!("Bot fucked up fuck you YouTube {:#?}", why);
 
-                  if manager.join(&guild, chan_id).is_some() {
-                    println!("Joined {}", &chan_id);
-                  }
+                        continue 'chan_iter;
+                      },
+                    };
 
-                  if manager.join(&guild, chan_id).is_some() {
-                    println!("Joined {}", &chan_id);
-                  }
+                    print!("Playing audio");
+                    let safe_audio: LockedAudio = handler.play_only(source);
+                    {
+                      let audio_lock = safe_audio.clone();
+                      let audio = audio_lock.lock().await;
 
-                  match manager.get_mut(&guild) {
-                    Some(handler) => {
-                      println!("Starting YouTube download...");
-                      // let source = match voice::ytdl("https://youtube.com/watch?v=S7rM1zmCj1M").await {
-                      let source = match voice::ytdl("https://www.youtube.com/watch?v=oNXzMBA9VU4").await {
-                        Ok(source) => source,
-                        Err(why) => {
-                          println!("Bot fucked up fuck you YouTube {:#?}", why);
-
-                          continue 'chan_iter;
-                        },
-                      };
-
-                      print!("Playing audio");
-                      let safe_audio: LockedAudio = handler.play_only(source);
-                      {
-                        let audio_lock = safe_audio.clone();
-                        let audio = audio_lock.lock().await;
-
-                        while audio.playing {
-                          std::thread::sleep(Duration::from_millis(100));
-                          print!(".");
-                        }
-
-                        println!("\nFinished playback");
-                        manager.leave(&guild);
+                      while audio.playing {
+                        std::thread::sleep(Duration::from_millis(100));
+                        print!(".");
                       }
-                    },
-                    None => {
+
+                      println!("\nFinished playback");
                       manager.leave(&guild);
-                    },
-                  };
+                    }
+                  } else {
+                    continue 'chan_iter;
+                  }
 
                   // Leave for loop early
                   break 'chan_iter;
