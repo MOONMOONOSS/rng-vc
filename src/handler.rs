@@ -89,11 +89,11 @@ impl EventHandler for Handler {
                         }
 
                         println!("\nFinished playback");
-                        manager.remove(&guild);
+                        manager.leave(&guild);
                       }
                     },
                     None => {
-                      manager.remove(&guild);
+                      manager.leave(&guild);
                     },
                   };
 
