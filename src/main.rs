@@ -1,12 +1,17 @@
 use std::{
+  marker::PhantomData,
   sync::Arc,
-  thread::JoinHandle,
 };
 
+use async_std::task::JoinHandle;
 use serenity::{
-  Client, 
+  Client,
+  client::bridge::voice::ClientVoiceManager,
   framework::StandardFramework,
-  prelude::TypeMapKey,
+  prelude::{
+    Mutex,
+    TypeMapKey,
+  },
 };
 
 mod config;
@@ -18,10 +23,18 @@ impl TypeMapKey for Configuration {
   type Value = Arc<config::Configuration>;
 }
 
-pub struct GameThread;
+pub(crate) struct GameThread<T> {
+  phantom: PhantomData<T>,
+}
 
-impl TypeMapKey for GameThread {
-  type Value = JoinHandle<()>;
+impl<T: 'static + std::marker::Send> TypeMapKey for GameThread<T> {
+  type Value = &'static JoinHandle<T>;
+}
+
+pub(crate) struct VoiceManager;
+
+impl TypeMapKey for VoiceManager {
+  type Value = Arc<Mutex<ClientVoiceManager>>;
 }
 
 #[tokio::main]
@@ -38,6 +51,7 @@ async fn main() {
     let mut data = client.data.write().await;
 
     data.insert::<Configuration>(Arc::clone(&config));
+    data.insert::<VoiceManager>(Arc::clone(&client.voice_manager));
   }
 
   let why = match client.start().await {
