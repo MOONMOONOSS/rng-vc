@@ -32,7 +32,7 @@ impl EventHandler for Handler {
     let config = Arc::clone(&state.get::<crate::Configuration>().expect("Where's muh config bro?"));
     let http = Arc::clone(&ctx.http);
     let cache = Arc::clone(&ctx.cache);
-    let manager_lock = ctx.data.read().await.get::<crate::VoiceManager>().cloned().unwrap();
+    let manager_lock = state.get::<crate::VoiceManager>().cloned().unwrap();
 
     let guild = GuildId(config.server_id);
 
@@ -60,7 +60,7 @@ impl EventHandler for Handler {
                   // Join channel logic
                   let mut manager = manager_lock.lock().await;
 
-                  if let Some(handler) = manager.join(&guild, chan_id) {
+                  if let Some(handler) = manager.join(guild, chan_id) {
                     println!("{}", handler.connect());
                     handler.join(*chan_id);
                     println!("Starting YouTube download...");
@@ -86,7 +86,7 @@ impl EventHandler for Handler {
                       }
 
                       println!("\nFinished playback");
-                      manager.leave(&guild);
+                      manager.leave(guild);
                     }
                   } else {
                     continue 'chan_iter;
