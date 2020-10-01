@@ -67,7 +67,8 @@ impl EventHandler for Handler {
                   match manager.get_mut(&guild) {
                     Some(handler) => {
                       println!("Starting YouTube download...");
-                      let source = match voice::ytdl("https://youtube.com/watch?v=S7rM1zmCj1M").await {
+                      // let source = match voice::ytdl("https://youtube.com/watch?v=S7rM1zmCj1M").await {
+                      let source = match voice::ytdl("https://www.youtube.com/watch?v=oNXzMBA9VU4").await {
                         Ok(source) => source,
                         Err(why) => {
                           println!("Bot fucked up fuck you YouTube {:#?}", why);
