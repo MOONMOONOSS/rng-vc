@@ -39,7 +39,7 @@ impl EventHandler for Handler {
     println!("Scheduled async task has started");
 
     loop {
-      std::thread::sleep(Duration::from_secs(config.interval));
+      tokio::time::delay_for(Duration::from_secs(config.interval)).await;
 
       // Get all voice channels in the guild
       // Must have permission to Connect and Speak without Push to Talk
